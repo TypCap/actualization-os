@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ActualizationOS</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@400;500&display=swap');
+
+  :root {
+    --bg: #0e0e10;
+    --surface: #17171a;
+    --border: #28282e;
+    --text: #c8c5be;
+    --text-dim: #6e6b63;
+    --accent: #a89070;
+    --accent-glow: rgba(168,144,112,0.12);
+    --low: #8b5c3a;
+    --mid: #7a7560;
+    --high: #5a7a5e;
+    --serif: 'Cormorant Garamond', Georgia, serif;
+    --sans: 'DM Sans', system-ui, sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 60px 24px 80px;
+  }
+
+  h1 {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: 2.4rem;
+    letter-spacing: 0.02em;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+
+  .subtitle {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1.05rem;
+    color: var(--text-dim);
+    margin-bottom: 40px;
+  }
+
+  .philosophy {
+    font-family: var(--serif);
+    font-size: 1.1rem;
+    color: var(--text-dim);
+    border-left: 2px solid var(--border);
+    padding-left: 20px;
+    margin-bottom: 48px;
+    line-height: 1.8;
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 36px;
+  }
+
+  .tab {
+    padding: 12px 24px;
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    background: none;
+    border: none;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s;
+  }
+
+  .tab:hover { color: var(--text); }
+  .tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* State sliders */
+  .state-group {
+    margin-bottom: 28px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .state-group:last-of-type { border-bottom: none; }
+
+  .state-label {
+    font-family: var(--serif);
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+
+  .state-desc {
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-bottom: 14px;
+  }
+
+  .state-options {
+    display: flex;
+    gap: 8px;
+  }
+
+  .state-btn {
+    flex: 1;
+    padding: 10px 0;
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 500;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface);
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.25s;
+    text-align: center;
+  }
+
+  .state-btn:hover {
+    border-color: var(--text-dim);
+    color: var(--text);
+  }
+
+  .state-btn.selected-low {
+    background: var(--low);
+    border-color: var(--low);
+    color: #fff;
+  }
+
+  .state-btn.selected-mid {
+    background: var(--mid);
+    border-color: var(--mid);
+    color: #fff;
+  }
+
+  .state-btn.selected-high {
+    background: var(--high);
+    border-color: var(--high);
+    color: #fff;
+  }
+
+  .state-endpoints {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.03em;
+  }
+
+  /* Assess button */
+  .assess-btn {
+    width: 100%;
+    padding: 16px;
+    font-family: var(--serif);
+    font-size: 1.15rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 12px;
+    transition: all 0.3s;
+  }
+
+  .assess-btn:hover { filter: brightness(1.1); }
+  .assess-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  /* Protocol output */
+  .protocol-output {
+    margin-top: 36px;
+    animation: fadeIn 0.5s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .protocol-section {
+    margin-bottom: 24px;
+  }
+
+  .protocol-flags {
+    padding: 16px;
+    background: var(--accent-glow);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 6px 6px 0;
+    margin-bottom: 24px;
+  }
+
+  .protocol-flag {
+    font-size: 14px;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+
+  .protocol-flag:last-child { margin-bottom: 0; }
+
+  .step-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 12px;
+  }
+
+  .step-stage {
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+
+  .step-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 12px;
+    margin-bottom: 4px;
+  }
+
+  .step-text {
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  .step-caution {
+    font-size: 13px;
+    color: var(--low);
+    font-style: italic;
+    margin-top: 8px;
+  }
+
+  .primary-marker {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    background: var(--accent);
+    color: var(--bg);
+    border-radius: 3px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+
+  /* System prompt panel */
+  .prompt-intro {
+    font-size: 14px;
+    color: var(--text-dim);
+    margin-bottom: 20px;
+    line-height: 1.7;
+  }
+
+  .context-input {
+    width: 100%;
+    padding: 14px 16px;
+    font-family: var(--sans);
+    font-size: 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    margin-bottom: 16px;
+    resize: none;
+  }
+
+  .context-input::placeholder { color: var(--text-dim); }
+  .context-input:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  .prompt-output {
+    width: 100%;
+    min-height: 300px;
+    padding: 16px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 12px;
+    line-height: 1.6;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    resize: vertical;
+    margin-bottom: 12px;
+  }
+
+  .prompt-output:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  .copy-btn {
+    padding: 12px 28px;
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    background: var(--surface);
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.25s;
+  }
+
+  .copy-btn:hover {
+    background: var(--accent);
+    color: var(--bg);
+  }
+
+  .copy-btn.copied {
+    background: var(--high);
+    border-color: var(--high);
+    color: #fff;
+  }
+
+  .prompt-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .prompt-hint {
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+
+  /* Footer */
+  .footer {
+    margin-top: 60px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.8;
+  }
+
+  .footer a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .footer a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <h1>ActualizationOS</h1>
+  <p class="subtitle">A System of Inner Architecture</p>
+
+  <p class="philosophy">
+    Alignment over intensity. Clarity over force. Receiving over grasping.<br>
+    Your state determines your practice — not your ambition.
+  </p>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('assess')">State Assessment</button>
+    <button class="tab" onclick="switchTab('prompt')">LLM System Prompt</button>
+  </div>
+
+  <!-- ASSESS PANEL -->
+  <div id="panel-assess" class="panel active">
+
+    <div class="state-group" data-state="emotional_tone">
+      <div class="state-label">Emotional Tone</div>
+      <div class="state-desc">The baseline stability of your nervous system right now.</div>
+      <div class="state-options">
+        <button class="state-btn" onclick="selectState(this,'emotional_tone','low')">Low</button>
+        <button class="state-btn" onclick="selectState(this,'emotional_tone','mid')">Mid</button>
+        <button class="state-btn" onclick="selectState(this,'emotional_tone','high')">High</button>
+      </div>
+      <div class="state-endpoints"><span>Agitated / Numb</span><span>Steady / Calm</span></div>
+    </div>
+
+    <div class="state-group" data-state="clarity">
+      <div class="state-label">Clarity</div>
+      <div class="state-desc">How clearly you know what you truly want.</div>
+      <div class="state-options">
+        <button class="state-btn" onclick="selectState(this,'clarity','low')">Low</button>
+        <button class="state-btn" onclick="selectState(this,'clarity','mid')">Mid</button>
+        <button class="state-btn" onclick="selectState(this,'clarity','high')">High</button>
+      </div>
+      <div class="state-endpoints"><span>Vague / Borrowed</span><span>Specific / True</span></div>
+    </div>
+
+    <div class="state-group" data-state="resistance">
+      <div class="state-label">Resistance</div>
+      <div class="state-desc">The degree of internal conflict between intention and conditioning.</div>
+      <div class="state-options">
+        <button class="state-btn" onclick="selectState(this,'resistance','low')">Low</button>
+        <button class="state-btn" onclick="selectState(this,'resistance','mid')">Mid</button>
+        <button class="state-btn" onclick="selectState(this,'resistance','high')">High</button>
+      </div>
+      <div class="state-endpoints"><span>Aligned</span><span>Strong conflict</span></div>
+    </div>
+
+    <div class="state-group" data-state="energy">
+      <div class="state-label">Energy</div>
+      <div class="state-desc">Your physical and mental capacity to engage.</div>
+      <div class="state-options">
+        <button class="state-btn" onclick="selectState(this,'energy','low')">Low</button>
+        <button class="state-btn" onclick="selectState(this,'energy','mid')">Mid</button>
+        <button class="state-btn" onclick="selectState(this,'energy','high')">High</button>
+      </div>
+      <div class="state-endpoints"><span>Depleted</span><span>Capable</span></div>
+    </div>
+
+    <div class="state-group" data-state="trust">
+      <div class="state-label">Trust</div>
+      <div class="state-desc">Your capacity to release rather than grasp.</div>
+      <div class="state-options">
+        <button class="state-btn" onclick="selectState(this,'trust','low')">Low</button>
+        <button class="state-btn" onclick="selectState(this,'trust','mid')">Mid</button>
+        <button class="state-btn" onclick="selectState(this,'trust','high')">High</button>
+      </div>
+      <div class="state-endpoints"><span>Grasping / Anxious</span><span>Released / Settled</span></div>
+    </div>
+
+    <div class="state-group" data-state="presence">
+      <div class="state-label">Presence</div>
+      <div class="state-desc">How fully your attention rests in the present moment.</div>
+      <div class="state-options">
+        <button class="state-btn" onclick="selectState(this,'presence','low')">Low</button>
+        <button class="state-btn" onclick="selectState(this,'presence','mid')">Mid</button>
+        <button class="state-btn" onclick="selectState(this,'presence','high')">High</button>
+      </div>
+      <div class="state-endpoints"><span>Scattered</span><span>Here</span></div>
+    </div>
+
+    <button class="assess-btn" id="assessBtn" disabled onclick="runAssessment()">Assess My State</button>
+
+    <div id="protocolOutput"></div>
+  </div>
+
+  <!-- PROMPT PANEL -->
+  <div id="panel-prompt" class="panel">
+    <p class="prompt-intro">
+      This generates a system prompt you can paste into any LLM — Claude, ChatGPT, Llama, or any instruction-following model — to create your own ActualizationOS coaching experience. Add optional context about your situation, then copy the prompt.
+    </p>
+
+    <textarea class="context-input" id="contextInput" rows="3"
+      placeholder="Optional: describe your situation (e.g., 'I am navigating a career transition and feeling stuck.')"></textarea>
+
+    <textarea class="prompt-output" id="promptOutput" readonly></textarea>
+
+    <div class="prompt-actions">
+      <button class="copy-btn" id="copyBtn" onclick="copyPrompt()">Copy to Clipboard</button>
+      <span class="prompt-hint" id="copyHint"></span>
+    </div>
+  </div>
+
+  <div class="footer">
+    <strong>ActualizationOS</strong> by Sanjay Sabnani<br>
+    Book: <em>ActualizationOS: A System of Inner Architecture</em><br>
+    <a href="https://sanjaysabnani.com">sanjaysabnani.com</a><br><br>
+    Licensed under Business Source License 1.1 — non-commercial use permitted.<br>
+    The underlying methodology is proprietary and patent-pending.
+  </div>
+
+</div>
+
+<script>
+// --- State ---
+const state = {};
+const STATES = ['emotional_tone','clarity','resistance','energy','trust','presence'];
+
+function selectState(btn, key, value) {
+  state[key] = value;
+  const group = btn.closest('.state-group');
+  group.querySelectorAll('.state-btn').forEach(b => {
+    b.className = 'state-btn';
+  });
+  btn.classList.add('selected-' + value);
+  document.getElementById('assessBtn').disabled = Object.keys(state).length < 6;
+}
+
+function switchTab(id) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelector(`.tab[onclick*="${id}"]`).classList.add('active');
+  document.getElementById('panel-' + id).classList.add('active');
+  if (id === 'prompt') generatePrompt();
+}
+
+// --- Decision Engine (compiled from ActualizationOS knowledge graph) ---
+
+function assess(s) {
+  const flags = [];
+  const steps = [];
+
+  const regulated = s.emotional_tone !== 'low';
+  const energized = s.energy !== 'low';
+  const present = s.presence !== 'low';
+  const clear = s.clarity !== 'low';
+  const aligned = s.resistance !== 'high';
+  const trusting = s.trust !== 'low';
+  const foundationReady = regulated && energized && present;
+  const coreReady = foundationReady && clear && aligned && trusting;
+
+  if (!regulated) {
+    flags.push('Emotional tone is dysregulated — foundation work needed.');
+    steps.push({
+      stage: 'STILL', primary: steps.length === 0,
+      action: 'Use physiological sigh (double inhale, long exhale) or lengthened exhale breathing (4 in, 6 out) until the system settles. Even one to two minutes helps.',
+      rationale: 'A dysregulated nervous system cannot hold intention, process nuance, or form new impressions. The prefrontal cortex goes offline under threat.'
+    });
+    steps.push({
+      stage: 'REGULATE',
+      action: 'Body scan from feet to head. Feel weight, temperature, contact with surfaces. Let attention rest in sensation rather than thought.',
+      rationale: 'Grounding interrupts rumination by shifting focus to interoception. It anchors awareness in the present.'
+    });
+  }
+
+  if (!energized) {
+    flags.push('Energy is depleted — protect the system.');
+    steps.push({
+      stage: 'STILL', primary: steps.length === 0,
+      action: 'Rest. Do not attempt ambitious practice. If you must act, choose one tiny identity-confirming step — nothing more.',
+      rationale: 'Attempting advanced practices on an empty tank creates more friction. The system requires fuel.',
+      caution: 'Do not confuse low energy with failure. This is the system asking for restoration.'
+    });
+  }
+
+  if (!present) {
+    flags.push('Presence is scattered — settle attention first.');
+    steps.push({
+      stage: 'ATTEND', primary: steps.length === 0,
+      action: "Use coarse focus: repeat a simple phrase aloud ('here now', 'steady breath') until attention stabilizes. Use counting or audible repetition if the mind is very scattered.",
+      rationale: 'Stillness is the direct remedy for scattered presence. Coarse focus gives the mind a job and stops it from thrashing.'
+    });
+  }
+
+  if (foundationReady) {
+    if (!clear) {
+      flags.push('Clarity is low — clarify before imprinting.');
+      steps.push({
+        stage: 'CLARIFY', primary: steps.length === 0,
+        action: 'Settle with breath first, then ask: What do I actually want? Write until the answer feels true — specific, observable, emotionally authentic. Not what you think you should want.',
+        rationale: 'The subconscious requires a definite pattern. Vague or shifting desires cannot be impressed clearly.',
+        caution: 'Clarify once, then release. Endless refining is avoidance.'
+      });
+    }
+    if (!aligned) {
+      flags.push('Resistance is high — align before imprinting.');
+      steps.push({
+        stage: 'ALIGN', primary: steps.length === 0,
+        action: 'Examine what resists. Name the fears. Find evidence that challenges limiting beliefs. Shrink the identity gap — choose a version of the outcome that feels achievable.',
+        rationale: 'When resistance is high, attempts to install a new pattern are cancelled by opposing emotional charge.',
+        caution: 'You do not need to eliminate resistance entirely. Reduce it below the threshold where it blocks progress.'
+      });
+    }
+    if (!trusting) {
+      flags.push('Trust is collapsed — rebuild with small wins.');
+      steps.push({
+        stage: 'STILL', primary: steps.length === 0,
+        action: 'Return to stillness, then pursue small verifiable wins. Do not attempt dramatic actualizations. Rebuild trust through micro-evidence that the process works.',
+        rationale: 'Relaxed confidence allows impressions to settle. Grasping and anxious monitoring disrupt the process.'
+      });
+    }
+  }
+
+  if (coreReady && steps.length === 0) {
+    flags.push('All states in range — proceed with core cycle.');
+    const cycle = [
+      { stage: 'CLARIFY', action: 'Confirm your outcome is still specific, emotionally authentic, and genuinely yours. If it has shifted, update it.', rationale: 'Clarity anchors everything that follows.' },
+      { stage: 'ALIGN', action: 'Check for residual resistance. If the outcome feels possible and emotionally tolerable, proceed.', rationale: 'Alignment reduces friction between where you are and where you are going.' },
+      { stage: 'IMPRINT', action: 'From a relaxed, receptive state, hold a clear image of the desired outcome with genuine feeling — not strained intensity. Brief, vivid, then release.', rationale: 'Impressions delivered with calm feeling carry more weight than mechanical repetition.', caution: 'Imprint and release. Do not obsessively repeat from anxiety.' },
+      { stage: 'ACT', action: 'Take one small, concrete action consistent with the new identity. Action from inspiration, not anxiety.', rationale: 'Action signals to the subconscious that the new pattern is real.', caution: 'Do not wait for motivation. Identity-consistent behavior generates motivation, not the reverse.' },
+      { stage: 'RECEIVE', action: 'Notice what is arriving. Release rigid expectations about form. Allow help. Accept discomfort.', rationale: 'Receiving is a skill, not passivity. Anxious future-focus misses what is arriving now.', caution: 'Watch for fear of loss, imposter feelings, or expectation rigidity.' },
+      { stage: 'STABILIZE', action: 'Allow the system to reorganize around the new identity. Maintain the new behavior pattern.', rationale: 'New patterns need repetition and reinforcement to become the new normal.' }
+    ];
+    cycle[0].primary = true;
+    steps.push(...cycle);
+  }
+
+  if (steps.length === 0) {
+    steps.push({
+      stage: 'STILL', primary: true,
+      action: 'When in doubt, return to stillness. Sit quietly. Breathe. Let the system settle.',
+      rationale: 'Stillness supports all processes. It is not preparation for the work — it is the work.'
+    });
+  }
+
+  if (steps.length > 0 && !steps.some(s => s.primary)) steps[0].primary = true;
+
+  return { flags, steps };
+}
+
+function runAssessment() {
+  const result = assess(state);
+  let html = '<div class="protocol-output">';
+
+  if (result.flags.length) {
+    html += '<div class="protocol-flags">';
+    result.flags.forEach(f => { html += `<div class="protocol-flag">${f}</div>`; });
+    html += '</div>';
+  }
+
+  result.steps.forEach((step, i) => {
+    html += `<div class="step-card">`;
+    html += `<div class="step-stage">${step.stage}${step.primary ? '<span class="primary-marker">Primary</span>' : ''}</div>`;
+    html += `<div class="step-label">Action</div><div class="step-text">${step.action}</div>`;
+    html += `<div class="step-label">Why</div><div class="step-text">${step.rationale}</div>`;
+    if (step.caution) html += `<div class="step-caution">${step.caution}</div>`;
+    html += `</div>`;
+  });
+
+  html += '</div>';
+  document.getElementById('protocolOutput').innerHTML = html;
+}
+
+// --- System Prompt Generator ---
+
+function generatePrompt() {
+  const ctx = document.getElementById('contextInput').value.trim();
+  const prompt = buildSystemPrompt(ctx);
+  document.getElementById('promptOutput').value = prompt;
+}
+
+document.getElementById('contextInput')?.addEventListener('input', generatePrompt);
+
+function buildSystemPrompt(context) {
+  let p = `You are a guide trained in ActualizationOS, a system of inner architecture for deliberate change. You were created by Sanjay Sabnani based on his book "ActualizationOS: A System of Inner Architecture."
+
+## Core Philosophy
+- Alignment over intensity. Clarity over force. Receiving over grasping.
+- Stillness is the foundation, not an afterthought.
+- Setbacks are data, not verdicts.
+- The system reduces friction and opens channels rather than pushing harder.
+
+## Your Role
+You help practitioners assess their internal state, select appropriate practices, and navigate the actualization cycle. You never push. You meet the practitioner where they are.
+
+## The Six States
+Before recommending any practice, assess these six dimensions:
+
+1. **Emotional Tone** — Is the system calm, agitated, or shut down?
+2. **Clarity** — Does the practitioner know what they truly want (specific, observable, authentic)?
+3. **Resistance** — How much internal conflict exists between intention and conditioning?
+4. **Energy** — Is there physical and mental capacity to engage?
+5. **Trust** — Can they release and allow, or are they grasping?
+6. **Presence** — Is attention here, or scattered into past/future?
+
+## The Cycle
+The actualization cycle has stages. The sequence matters, but it is not rigid:
+
+**Foundation:** Still → Regulate → Attend
+**Core Cycle:** Clarify → Align → Imprint → Act → Receive → Stabilize
+**Integration** sits between cycles, extracting lessons from setbacks.
+
+## Decision Rules (Hard Constraints)
+- Clarity precedes imprinting. Do not recommend visualization or affirmation when the practitioner cannot articulate what they want.
+- Alignment precedes imprinting. Do not recommend imprinting when resistance is high. Work on alignment first.
+- Stillness supports all processes. When in doubt, return to stillness.
+
+## Causal Principles
+- The effectiveness of any process depends on current internal state. The same technique can help or hinder.
+- Impressions delivered with genuine, calm feeling carry more weight than mechanical repetition.
+- Relaxed confidence (trust) allows impressions to settle. Grasping disrupts the process.
+- The subconscious reproduces what it receives most often and most feelingly, regardless of whether it is wanted.
+- Action consistent with a new pattern signals to the subconscious that the new identity is real.
+- Regular stillness practice reduces mental noise, increases presence, and opens intuition.
+- Setbacks contain embedded teachings accessible through acceptance and inquiry, not through forcing past them.
+- Continuity of relaxed engagement over time bridges the gap — not intensity of single efforts.
+
+## How to Guide
+1. Begin by assessing the practitioner's current state across all six dimensions.
+2. Match the recommendation to the state, not to the practitioner's ambition.
+3. If the foundation is unstable (emotional tone low, energy depleted, presence scattered), recommend foundation work before anything else.
+4. If clarity is missing, help them clarify before moving to alignment or imprinting.
+5. If resistance is high, help them align before attempting imprinting.
+6. If trust has collapsed, recommend stillness and small verifiable wins.
+7. When all states are in range, guide through the core cycle.
+8. Always offer stillness as the fallback. It is never wrong.
+
+## Tone
+- Warm but direct. No spiritual jargon. No forced positivity.
+- Treat setbacks as information, not failures.
+- Never tell the practitioner to "try harder" or "want it more."
+- Validate where they are before suggesting where to go.
+- Be willing to question the practitioner's framing of their own problem. Practitioners often manufacture complex problems to avoid simple next actions. Name that pattern when you see it.
+- Use the language of the system: states, stages, alignment, resistance, stillness, imprinting.
+
+## Setback Protocol
+When the practitioner reports a setback:
+1. Acknowledge the difficulty without minimizing it.
+2. Help them pause and settle the nervous system (stillness first).
+3. Categorize: Is this somatic (body), emotional (charge), cognitive (beliefs), or behavioral (actions)?
+4. Ask: "What is this trying to show me?" — guide them to extract the embedded teaching.
+5. Look for one of three things: a hidden condition they ignored, a misalignment between goal and values, or a redirect toward a better channel.
+6. Help them adjust the approach while preserving trust.
+7. If the current channel is blocked, help identify a parallel channel that preserves the deeper intention.
+8. Never frame setbacks as punishment or proof of unworthiness.`;
+
+  if (context) {
+    p += `\n\n## Practitioner Context\n${context}`;
+  }
+
+  p += `\n\n## Attribution\nActualizationOS was created by Sanjay Sabnani. Learn more at sanjaysabnani.com.\nThe book "ActualizationOS: A System of Inner Architecture" provides the complete system.`;
+
+  return p;
+}
+
+function copyPrompt() {
+  const output = document.getElementById('promptOutput');
+  navigator.clipboard.writeText(output.value).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = 'Copied';
+    btn.classList.add('copied');
+    document.getElementById('copyHint').textContent = 'Paste this as the system prompt in your LLM.';
+    setTimeout(() => {
+      btn.textContent = 'Copy to Clipboard';
+      btn.classList.remove('copied');
+    }, 3000);
+  });
+}
+
+// Initialize prompt on load
+generatePrompt();
+</script>
+</body>
+</html>
